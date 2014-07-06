@@ -12,6 +12,18 @@
 #include "jconf.h"
 #include "utils.h"
 
+static bool is_little_endian()
+{
+    union w
+    {
+       int a;
+       char b;
+                  
+    } c;
+    c.a = 1;
+    return(c.b == 1);
+}
+
 int SetupUDPServerSocket(const char *service) {
     // Construct the server address structure
     struct addrinfo addrCriteria;                                     // Criteria for address match
@@ -106,7 +118,12 @@ static void convert_domain(char *host, char *domain){
 }
 
 static bool is_bad_reply(char *buffer){
-    uint32_t net_ip = (buffer[0] & 0xFF) + ((buffer[1] & 0xFF) << 8) + ((buffer[2] & 0xFF) << 16) + ((buffer[3] & 0xFF) << 24);
+    uint32_t net_ip;
+    if(is_little_endian()){
+        net_ip = (buffer[0] & 0xFF) + ((buffer[1] & 0xFF) << 8) + ((buffer[2] & 0xFF) << 16) + ((buffer[3] & 0xFF) << 24);
+    }else {
+        net_ip = (buffer[3] & 0xFF) + ((buffer[2] & 0xFF) << 8) + ((buffer[1] & 0xFF) << 16) + ((buffer[0] & 0xFF) << 24);
+    }
     int i = 0;
     while(i < fake_addr_num) {
         if(net_ip == fake_dns_addr[i]) {

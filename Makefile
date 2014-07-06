@@ -50,7 +50,7 @@ define Package/dnsproxy
 	CATEGORY:=Network
 	TITLE:=verify twitter friends on router
 	URL:=https://github.com/scola/dnsproxy
-	DEPENDS:=+libcurl +libpthread
+	DEPENDS:=+libpthread
 endef
 
 define Package/dnsproxy/description
